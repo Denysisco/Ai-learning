@@ -17,7 +17,7 @@
 
 - [x] Lesson 1.1 — What is a prompt? Write your first one.
 - [x] Lesson 1.2 — Learn what makes a prompt good vs bad (with examples)
-- [ ] Lesson 1.3 — Use prompts to generate a short story character for your future game
+- [x] Lesson 1.3 — Use prompts to generate a short story character for your future game
 - [ ] Lesson 1.4 — Make the AI play a simple "yes or no" adventure with you using only prompts
 
 ---
