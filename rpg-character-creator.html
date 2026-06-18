@@ -330,29 +330,29 @@
           <input type="text" id="charName" placeholder="Enter your name..." maxlength="30">
         </div>
 
-        <!-- Class Selection -->
+        <!-- Class Selection (Powers) -->
         <div>
-          <div class="section-title">Choose Your Class</div>
+          <div class="section-title">Choose Your Power</div>
           <div class="class-selection">
             <button class="class-btn" data-class="warrior">
               ⚔ WARRIOR
-              <div class="class-desc">Strong attack & defense. Balanced.</div>
+              <div class="class-desc">Master of melee combat. Raw strength.</div>
             </button>
             <button class="class-btn" data-class="mage">
               🔮 MAGE
-              <div class="class-desc">High magic, low defense. Glass cannon.</div>
+              <div class="class-desc">Master of arcane magic. Spell power.</div>
             </button>
             <button class="class-btn" data-class="rogue">
               🗡️ ROGUE
-              <div class="class-desc">High speed & attack. Low defense.</div>
+              <div class="class-desc">Master of speed & precision. Swift strikes.</div>
             </button>
             <button class="class-btn" data-class="paladin">
               ✨ PALADIN
-              <div class="class-desc">High defense & magic. Balanced slow.</div>
+              <div class="class-desc">Master of protection & light. Balanced magic.</div>
             </button>
-            <button class="class-btn" data-class="custom">
-              🎲 CUSTOM
-              <div class="class-desc">Build your own stats from scratch.</div>
+            <button class="class-btn" data-class="ranger">
+              🏹 RANGER
+              <div class="class-desc">Master of ranged combat. Tactical approach.</div>
             </button>
           </div>
         </div>
@@ -368,13 +368,13 @@
 
         <!-- Stat Allocation -->
         <div>
-          <div class="section-title">Allocate Stats</div>
+          <div class="section-title">Allocate 20 Points</div>
           <div class="stat-group">
             <div class="stat-row">
               <div class="stat-label">HP</div>
               <div class="stat-controls">
                 <button class="stat-btn" id="hp-minus">−</button>
-                <div class="stat-value" id="hp-val">10</div>
+                <div class="stat-value" id="hp-val">0</div>
                 <div class="stat-bar"><div class="stat-bar-fill" id="hp-bar"></div></div>
                 <button class="stat-btn" id="hp-plus">+</button>
               </div>
@@ -384,7 +384,7 @@
               <div class="stat-label">Attack</div>
               <div class="stat-controls">
                 <button class="stat-btn" id="atk-minus">−</button>
-                <div class="stat-value" id="atk-val">5</div>
+                <div class="stat-value" id="atk-val">0</div>
                 <div class="stat-bar"><div class="stat-bar-fill" id="atk-bar"></div></div>
                 <button class="stat-btn" id="atk-plus">+</button>
               </div>
@@ -394,7 +394,7 @@
               <div class="stat-label">Defense</div>
               <div class="stat-controls">
                 <button class="stat-btn" id="def-minus">−</button>
-                <div class="stat-value" id="def-val">5</div>
+                <div class="stat-value" id="def-val">0</div>
                 <div class="stat-bar"><div class="stat-bar-fill" id="def-bar"></div></div>
                 <button class="stat-btn" id="def-plus">+</button>
               </div>
@@ -404,7 +404,7 @@
               <div class="stat-label">Magic</div>
               <div class="stat-controls">
                 <button class="stat-btn" id="mag-minus">−</button>
-                <div class="stat-value" id="mag-val">5</div>
+                <div class="stat-value" id="mag-val">0</div>
                 <div class="stat-bar"><div class="stat-bar-fill" id="mag-bar"></div></div>
                 <button class="stat-btn" id="mag-plus">+</button>
               </div>
@@ -414,7 +414,7 @@
               <div class="stat-label">Speed</div>
               <div class="stat-controls">
                 <button class="stat-btn" id="spd-minus">−</button>
-                <div class="stat-value" id="spd-val">5</div>
+                <div class="stat-value" id="spd-val">0</div>
                 <div class="stat-bar"><div class="stat-bar-fill" id="spd-bar"></div></div>
                 <button class="stat-btn" id="spd-plus">+</button>
               </div>
@@ -426,12 +426,12 @@
         <div class="preview">
           <h3>Character Summary</h3>
           <div class="preview-stat">
-            <span>Class:</span>
-            <span class="preview-stat-value" id="preview-class">Custom</span>
+            <span>Power:</span>
+            <span class="preview-stat-value" id="preview-class">Warrior</span>
           </div>
           <div class="preview-stat">
             <span>Total Stats:</span>
-            <span class="preview-stat-value" id="preview-total">30</span>
+            <span class="preview-stat-value" id="preview-total">0 / 20</span>
           </div>
         </div>
       </div>
@@ -440,26 +440,17 @@
     <!-- Action Buttons -->
     <div class="button-group">
       <button class="btn btn-reset" onclick="resetStats()">Reset</button>
-      <button class="btn btn-create" id="createBtn" onclick="createCharacter()">Create Character</button>
+      <button class="btn btn-create" id="createBtn" onclick="createCharacter()">Enter World</button>
     </div>
   </div>
 
   <script>
-    // Class presets
-    const CLASS_PRESETS = {
-      warrior: { hp: 15, atk: 8, def: 8, mag: 3, spd: 6 },
-      mage: { hp: 8, atk: 4, def: 3, mag: 15, spd: 5 },
-      rogue: { hp: 10, atk: 12, def: 4, mag: 3, spd: 11 },
-      paladin: { hp: 13, atk: 6, def: 12, mag: 10, spd: 4 },
-      custom: { hp: 10, atk: 5, def: 5, mag: 5, spd: 5 }
-    };
-
     const MAX_POINTS = 20;
-    const MAX_STAT = 25;
-    const MIN_STAT = 1;
+    const MAX_STAT = 20;
+    const MIN_STAT = 0;
 
-    let stats = { hp: 10, atk: 5, def: 5, mag: 5, spd: 5 };
-    let selectedClass = 'custom';
+    let stats = { hp: 0, atk: 0, def: 0, mag: 0, spd: 0 };
+    let selectedClass = 'warrior';
 
     // Setup event listeners
     function setupListeners() {
@@ -482,11 +473,7 @@
       selectedClass = className;
       document.querySelectorAll('.class-btn').forEach(btn => btn.classList.remove('selected'));
       document.querySelector(`[data-class="${className}"]`).classList.add('selected');
-      
-      // Apply preset
-      const preset = CLASS_PRESETS[className];
-      stats = { ...preset };
-      updateDisplay();
+      updatePreview();
     }
 
     function addStat(stat) {
@@ -531,12 +518,14 @@
 
     function updatePreview() {
       const total = getTotalPoints();
-      document.getElementById('preview-class').textContent = selectedClass.toUpperCase();
-      document.getElementById('preview-total').textContent = total;
+      const className = selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1);
+      document.getElementById('preview-class').textContent = className;
+      document.getElementById('preview-total').textContent = total + ' / 20';
     }
 
     function resetStats() {
-      selectClass('custom');
+      stats = { hp: 0, atk: 0, def: 0, mag: 0, spd: 0 };
+      updateDisplay();
     }
 
     function createCharacter() {
@@ -546,10 +535,18 @@
         return;
       }
 
+      const total = getTotalPoints();
+      if (total !== MAX_POINTS) {
+        alert(`You must use all 20 stat points! (${total}/20 used)`);
+        return;
+      }
+
       const character = {
         name,
-        class: selectedClass,
+        power: selectedClass,
         stats,
+        level: 1,
+        experience: 0,
         created: new Date().toISOString()
       };
 
@@ -559,7 +556,7 @@
       localStorage.setItem('playerCharacter', JSON.stringify(character));
 
       // Show success message
-      alert(`✓ Welcome, ${name} the ${selectedClass.toUpperCase()}!\n\nYour character has been created. The game world awaits...`);
+      alert(`✓ Welcome, ${name}!\n\nYour ${selectedClass.toUpperCase()} power awaits in the world...`);
       
       // Redirect to game (when ready)
       // window.location.href = 'rpg-game.html';
@@ -567,7 +564,7 @@
 
     // Initialize
     setupListeners();
-    selectClass('custom');
+    selectClass('warrior');
   </script>
 </body>
 </html>
