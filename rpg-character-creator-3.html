@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPG Character Creator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d1a;
+      color: #e0e0ff;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #a78bfa;
+      text-align: center;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px #7c3aed;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* Admin bar */
+    #admin-bar {
+      position: fixed;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 100;
+    }
+
+    #admin-status {
+      font-size: 0.75rem;
+      color: #10b981;
+      display: none;
+    }
+
+    button.admin-btn {
+      background: #1f1f3a;
+      color: #a78bfa;
+      border: 1px solid #4c1d95;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    button.admin-btn:hover { background: #2d2d50; }
+
+    /* Admin panel */
+    #admin-panel {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      background: #111128;
+      border: 1px solid #4c1d95;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    #admin-panel h3 { color: #10b981; margin-bottom: 10px; font-size: 1rem; }
+    #admin-panel p  { color: #6b7280; font-size: 0.85rem; }
+
+    /* Main card */
+    .card {
+      background: #111128;
+      border: 1px solid #2d2d50;
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      color: #a78bfa;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #2d2d50;
+      padding-bottom: 8px;
+    }
+
+    /* Name input */
+    input[type=text] {
+      width: 100%;
+      background: #0d0d1a;
+      border: 1px solid #2d2d50;
+      border-radius: 8px;
+      color: #e0e0ff;
+      padding: 10px 14px;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type=text]:focus { border-color: #7c3aed; }
+
+    /* Class grid */
+    .class-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .class-btn {
+      background: #0d0d1a;
+      border: 2px solid #2d2d50;
+      border-radius: 10px;
+      padding: 12px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      color: #e0e0ff;
+      position: relative;
+    }
+
+    .class-btn:hover:not(.locked) { border-color: #7c3aed; background: #1a1a35; }
+    .class-btn.selected { border-color: #a78bfa; background: #1e1040; }
+
+    .class-btn .class-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+    .class-btn .class-name { font-size: 0.85rem; font-weight: bold; display: block; }
+    .class-btn .class-desc { font-size: 0.7rem; color: #6b7280; margin-top: 2px; display: block; }
+
+    .class-btn.locked {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .class-btn.locked .lock-tag {
+      display: block;
+      font-size: 0.65rem;
+      color: #ef4444;
+      margin-top: 4px;
+    }
+
+    /* Stat system */
+    .points-badge {
+      display: inline-block;
+      background: #7c3aed;
+      color: white;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
+    .points-badge.warn { background: #b45309; }
+    .points-badge.done { background: #065f46; }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-label { width: 80px; font-size: 0.85rem; color: #c4b5fd; }
+
+    .stat-controls { display: flex; align-items: center; gap: 6px; }
+
+    .stat-btn {
+      width: 28px;
+      height: 28px;
+      background: #1f1f3a;
+      border: 1px solid #4c1d95;
+      border-radius: 6px;
+      color: #a78bfa;
+      font-size: 1rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .stat-btn:hover { background: #2d2d50; }
+
+    .stat-value {
+      width: 28px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .stat-bar-wrap {
+      flex: 1;
+      background: #0d0d1a;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .stat-bar { height: 100%; border-radius: 4px; transition: width 0.2s; }
+    .bar-hp    { background: #ef4444; }
+    .bar-atk   { background: #f97316; }
+    .bar-def   { background: #3b82f6; }
+    .bar-magic { background: #a78bfa; }
+    .bar-speed { background: #10b981; }
+
+    /* Preview */
+    #preview {
+      background: #0d0d1a;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      line-height: 1.7;
+    }
+    #preview strong { color: #e0e0ff; }
+
+    /* Create button */
+    #create-btn {
+      width: 100%;
+      max-width: 600px;
+      padding: 14px;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-bottom: 40px;
+    }
+    #create-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #create-btn:not(:disabled):hover { opacity: 0.85; }
+
+    /* Modal */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #modal-overlay.show { display: flex; }
+
+    #modal {
+      background: #111128;
+      border: 1px solid #4c1d95;
+      border-radius: 16px;
+      padding: 28px;
+      width: 320px;
+      text-align: center;
+    }
+
+    #modal h3 { color: #a78bfa; margin-bottom: 12px; }
+    #modal input {
+      width: 100%;
+      background: #0d0d1a;
+      border: 1px solid #2d2d50;
+      border-radius: 8px;
+      color: #e0e0ff;
+      padding: 10px 14px;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      outline: none;
+      text-align: center;
+      letter-spacing: 3px;
+    }
+    #modal input:focus { border-color: #7c3aed; }
+    #modal-error { color: #ef4444; font-size: 0.8rem; margin-bottom: 10px; min-height: 18px; }
+
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-btns button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+    }
+    #modal-confirm { background: #7c3aed; color: white; }
+    #modal-confirm:hover { background: #6d28d9; }
+    #modal-cancel { background: #1f1f3a; color: #9ca3af; }
+    #modal-cancel:hover { background: #2d2d50; }
+
+    /* Success screen */
+    #success-screen {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #success-screen h2 { color: #10b981; font-size: 2rem; margin-bottom: 12px; }
+    #success-screen p  { color: #9ca3af; margin-bottom: 8px; font-size: 1rem; }
+    .big-icon { font-size: 4rem; margin-bottom: 16px; }
+    #play-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 40px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #play-btn:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<!-- Admin bar (top-right) -->
+<div id="admin-bar">
+  <span id="admin-status">&#10003; Admin Active</span>
+  <button class="admin-btn" id="admin-login-btn" onclick="openAdminModal()">&#128274; Admin Login</button>
+  <button class="admin-btn" id="admin-logout-btn" onclick="adminLogout()" style="display:none">Logout</button>
+</div>
+
+<!-- Admin panel (shown after login) -->
+<div id="admin-panel">
+  <h3>&#9881; Admin Panel</h3>
+  <p>You have admin access. The Druid class is now unlocked for character creation.</p>
+  <p style="margin-top:8px; color:#a78bfa">Future: manage game world, set server settings, view player data.</p>
+</div>
+
+<!-- Login modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h3>&#128274; Admin Login</h3>
+    <input type="password" id="password-input" placeholder="Enter password"
+           onkeydown="if(event.key==='Enter') confirmLogin()">
+    <div id="modal-error"></div>
+    <div class="modal-btns">
+      <button id="modal-cancel" onclick="closeAdminModal()">Cancel</button>
+      <button id="modal-confirm" onclick="confirmLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<h1>&#9876; Character Creator</h1>
+<p class="subtitle">Build your hero &mdash; distribute your 20 starting stat points however you want</p>
+
+<div id="main-content">
+
+  <!-- Name -->
+  <div class="card">
+    <h2>Your Name</h2>
+    <input type="text" id="char-name" placeholder="Enter your hero's name..." oninput="updatePreview()">
+  </div>
+
+  <!-- Class -->
+  <div class="card">
+    <h2>Choose Your Class <span style="color:#6b7280;font-size:0.8rem;font-weight:normal">&mdash; determines your powers, not your stats</span></h2>
+    <div class="class-grid" id="class-grid"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <h2>Allocate Your Stats</h2>
+    <div class="points-badge" id="points-display">20 points remaining</div>
+    <div id="stats-container"></div>
+  </div>
+
+  <!-- Preview -->
+  <div class="card">
+    <h2>Character Preview</h2>
+    <div id="preview">Fill in your name, pick a class, and allocate all 20 points to continue.</div>
+  </div>
+
+  <button id="create-btn" disabled onclick="createCharacter()">Allocate all 20 points to continue</button>
+
+</div>
+
+<!-- Success screen -->
+<div id="success-screen">
+  <div class="big-icon" id="success-icon">&#127881;</div>
+  <h2>Hero Created!</h2>
+  <p id="success-name"></p>
+  <p id="success-class"></p>
+  <p id="success-stats"></p>
+  <button id="play-btn" onclick="alert('The 3D world is coming soon! Your character is saved and ready.')">&#9654; Enter the World</button>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = 'H135531h';
+  const MAX_POINTS = 20;
+  const MAX_PER_STAT = 20;
+
+  const CLASSES = [
+    { id: 'warrior', name: 'Warrior', icon: '&#9876;',  desc: 'Master of melee combat',       adminOnly: false },
+    { id: 'mage',    name: 'Mage',    icon: '&#128302;', desc: 'Master of arcane magic',        adminOnly: false },
+    { id: 'rogue',   name: 'Rogue',   icon: '&#128481;', desc: 'Master of speed & precision',   adminOnly: false },
+    { id: 'paladin', name: 'Paladin', icon: '&#128737;', desc: 'Master of light & protection',  adminOnly: false },
+    { id: 'ranger',  name: 'Ranger',  icon: '&#127993;', desc: 'Master of ranged combat',       adminOnly: false },
+    { id: 'druid',   name: 'Druid',   icon: '&#127807;', desc: 'Control nature itself',         adminOnly: true  },
+  ];
+
+  const STATS = [
+    { id: 'hp',    label: 'HP',      barClass: 'bar-hp'    },
+    { id: 'atk',   label: 'Attack',  barClass: 'bar-atk'   },
+    { id: 'def',   label: 'Defense', barClass: 'bar-def'   },
+    { id: 'magic', label: 'Magic',   barClass: 'bar-magic'  },
+    { id: 'speed', label: 'Speed',   barClass: 'bar-speed'  },
+  ];
+
+  let statValues = { hp: 0, atk: 0, def: 0, magic: 0, speed: 0 };
+  let selectedClass = null;
+  let isAdmin = false;
+
+  window.onload = function() {
+    if (localStorage.getItem('rpg_admin') === 'true') setAdmin(true);
+    else renderClasses();
+    renderStats();
+  };
+
+  // --- Admin ---
+  function openAdminModal() {
+    document.getElementById('modal-overlay').classList.add('show');
+    document.getElementById('password-input').value = '';
+    document.getElementById('modal-error').textContent = '';
+    setTimeout(() => document.getElementById('password-input').focus(), 100);
+  }
+
+  function closeAdminModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+
+  function confirmLogin() {
+    const pw = document.getElementById('password-input').value;
+    if (pw === ADMIN_PASSWORD) {
+      setAdmin(true);
+      localStorage.setItem('rpg_admin', 'true');
+      closeAdminModal();
+    } else {
+      document.getElementById('modal-error').textContent = 'Wrong password. Try again.';
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-input').focus();
+    }
+  }
+
+  function adminLogout() {
+    if (selectedClass === 'druid') { selectedClass = null; updatePreview(); }
+    setAdmin(false);
+    localStorage.removeItem('rpg_admin');
+  }
+
+  function setAdmin(val) {
+    isAdmin = val;
+    document.getElementById('admin-status').style.display     = val ? 'inline' : 'none';
+    document.getElementById('admin-login-btn').style.display  = val ? 'none'   : 'inline-block';
+    document.getElementById('admin-logout-btn').style.display = val ? 'inline-block' : 'none';
+    document.getElementById('admin-panel').style.display      = val ? 'block'  : 'none';
+    renderClasses();
+  }
+
+  // --- Classes ---
+  function renderClasses() {
+    const grid = document.getElementById('class-grid');
+    grid.innerHTML = '';
+    CLASSES.forEach(cls => {
+      const locked = cls.adminOnly && !isAdmin;
+      const div = document.createElement('div');
+      div.className = 'class-btn' + (selectedClass === cls.id ? ' selected' : '') + (locked ? ' locked' : '');
+      div.innerHTML =
+        '<span class="class-icon">' + cls.icon + '</span>' +
+        '<span class="class-name">' + cls.name + '</span>' +
+        '<span class="class-desc">' + cls.desc + '</span>' +
+        (locked ? '<span class="lock-tag">&#128274; Admin Only</span>' : '');
+      if (!locked) div.onclick = () => selectClass(cls.id);
+      grid.appendChild(div);
+    });
+  }
+
+  function selectClass(id) {
+    selectedClass = id;
+    renderClasses();
+    updatePreview();
+  }
+
+  // --- Stats ---
+  function pointsUsed() { return Object.values(statValues).reduce((a, b) => a + b, 0); }
+  function pointsLeft()  { return MAX_POINTS - pointsUsed(); }
+
+  function renderStats() {
+    const container = document.getElementById('stats-container');
+    container.innerHTML = '';
+    STATS.forEach(stat => {
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      row.innerHTML =
+        '<span class="stat-label">' + stat.label + '</span>' +
+        '<div class="stat-controls">' +
+          '<button class="stat-btn" onclick="changeStat(\'' + stat.id + '\',-1)">&minus;</button>' +
+          '<span class="stat-value" id="val-' + stat.id + '">0</span>' +
+          '<button class="stat-btn" onclick="changeStat(\'' + stat.id + '\',+1)">+</button>' +
+        '</div>' +
+        '<div class="stat-bar-wrap">' +
+          '<div class="stat-bar ' + stat.barClass + '" id="bar-' + stat.id + '" style="width:0%"></div>' +
+        '</div>';
+      container.appendChild(row);
+    });
+  }
+
+  function changeStat(id, delta) {
+    const newVal = statValues[id] + delta;
+    if (newVal < 0 || newVal > MAX_PER_STAT) return;
+    if (delta > 0 && pointsLeft() <= 0) return;
+    statValues[id] = newVal;
+    updateStatDisplay();
+    updatePreview();
+  }
+
+  function updateStatDisplay() {
+    STATS.forEach(stat => {
+      document.getElementById('val-' + stat.id).textContent = statValues[stat.id];
+      document.getElementById('bar-' + stat.id).style.width = (statValues[stat.id] / MAX_PER_STAT * 100) + '%';
+    });
+    const left = pointsLeft();
+    const badge = document.getElementById('points-display');
+    badge.textContent = left === 0 ? 'All points allocated!' : left + ' point' + (left !== 1 ? 's' : '') + ' remaining';
+    badge.className = 'points-badge' + (left === 0 ? ' done' : left <= 5 ? ' warn' : '');
+  }
+
+  function updatePreview() {
+    const name = document.getElementById('char-name').value.trim();
+    const cls  = CLASSES.find(c => c.id === selectedClass);
+    const left = pointsLeft();
+    const ready = name && cls && left === 0;
+
+    const btn = document.getElementById('create-btn');
+    btn.disabled = !ready;
+    btn.textContent = ready
+      ? 'Create ' + name + ' the ' + cls.name + '!'
+      : 'Allocate all 20 points to continue';
+
+    const preview = document.getElementById('preview');
+    if (!name && !cls) {
+      preview.innerHTML = 'Fill in your name, pick a class, and allocate all 20 points to continue.';
+      return;
+    }
+    preview.innerHTML =
+      '<strong>Name:</strong> ' + (name || '???') + '<br>' +
+      '<strong>Class:</strong> ' + (cls ? cls.icon + ' ' + cls.name : '???') + '<br>' +
+      '<strong>Powers:</strong> ' + (cls ? cls.desc : '???') + '<br><br>' +
+      '<strong>HP</strong> ' + statValues.hp + ' &nbsp; ' +
+      '<strong>ATK</strong> ' + statValues.atk + ' &nbsp; ' +
+      '<strong>DEF</strong> ' + statValues.def + ' &nbsp; ' +
+      '<strong>MAG</strong> ' + statValues.magic + ' &nbsp; ' +
+      '<strong>SPD</strong> ' + statValues.speed + '<br><br>' +
+      '<strong>Points remaining:</strong> ' + left + (left === 0 ? ' &#10003;' : '');
+  }
+
+  function createCharacter() {
+    const name = document.getElementById('char-name').value.trim();
+    const cls  = CLASSES.find(c => c.id === selectedClass);
+    if (!name || !cls || pointsLeft() !== 0) return;
+
+    const character = {
+      name, class: cls.id, className: cls.name, classIcon: cls.icon,
+      stats: { ...statValues }, level: 1, xp: 0, createdAt: Date.now(),
+    };
+    localStorage.setItem('rpg_character', JSON.stringify(character));
+
+    document.getElementById('main-content').style.display  = 'none';
+    document.getElementById('admin-bar').style.display     = 'none';
+    document.getElementById('admin-panel').style.display   = 'none';
+
+    const s = document.getElementById('success-screen');
+    s.style.display = 'block';
+    document.getElementById('success-icon').innerHTML  = cls.icon;
+    document.getElementById('success-name').innerHTML  = '<strong>' + name + '</strong>';
+    document.getElementById('success-class').textContent = 'Class: ' + cls.name;
+    document.getElementById('success-stats').textContent  =
+      'HP ' + statValues.hp + '  ATK ' + statValues.atk + '  DEF ' + statValues.def +
+      '  MAG ' + statValues.magic + '  SPD ' + statValues.speed;
+  }
+</script>
+</body>
+</html>
