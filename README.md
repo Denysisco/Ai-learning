@@ -26,10 +26,10 @@
 > A text adventure is a game where you read a story and type your choices.
 > Think of it like a "Choose Your Own Adventure" book — but the AI writes it live.
 
-- [ ] Lesson 2.1 — Design your game world (characters, places, a quest)
-- [ ] Lesson 2.2 — Write a prompt that makes AI run your game
-- [ ] Lesson 2.3 — Playtest it and improve your prompts
-- [ ] Lesson 2.4 — Share your game with someone and watch them play
+- [x] Lesson 2.1 — Design your game world (characters, places, a quest)
+- [x] Lesson 2.2 — Write a prompt that makes AI run your game
+- [x] Lesson 2.3 — Playtest it and improve your prompts
+- [x] Lesson 2.4 — Share your game with someone and watch them play
 
 ---
 
