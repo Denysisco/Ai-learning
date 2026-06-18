@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPG Character Creator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e8dfc8;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 90%;
+      background: rgba(13, 10, 26, 0.95);
+      border: 2px solid #44ff99;
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 0 0 50px rgba(68, 255, 100, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #44ff99;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 0 0 20px rgba(68, 255, 100, 0.6);
+      letter-spacing: 3px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+      color: #ffd700;
+      border-bottom: 2px solid #44ff99;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    /* Name Input */
+    .name-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .name-input-group label {
+      color: #aaa;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .name-input-group input {
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #44ff99;
+      border-radius: 5px;
+      color: #44ff99;
+      font-size: 1.1em;
+    }
+
+    .name-input-group input::placeholder {
+      color: #666;
+    }
+
+    /* Class Selection */
+    .class-selection {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .class-btn {
+      padding: 15px;
+      background: rgba(0, 40, 20, 0.6);
+      border: 2px solid #44ff99;
+      border-radius: 5px;
+      color: #44ff99;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-align: left;
+    }
+
+    .class-btn:hover {
+      background: rgba(0, 60, 30, 0.8);
+      box-shadow: 0 0 20px rgba(68, 255, 100, 0.5);
+    }
+
+    .class-btn.selected {
+      background: rgba(68, 255, 100, 0.2);
+      box-shadow: 0 0 30px rgba(68, 255, 100, 0.7);
+      border-color: #ffd700;
+    }
+
+    .class-desc {
+      font-size: 0.8em;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    /* Stat Allocation */
+    .stat-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      border-left: 3px solid #44ff99;
+    }
+
+    .stat-label {
+      min-width: 100px;
+      color: #aaa;
+      text-transform: uppercase;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    .stat-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .stat-btn {
+      width: 30px;
+      height: 30px;
+      background: rgba(68, 255, 100, 0.2);
+      border: 1px solid #44ff99;
+      border-radius: 3px;
+      color: #44ff99;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: all 0.2s;
+    }
+
+    .stat-btn:hover {
+      background: rgba(68, 255, 100, 0.4);
+      box-shadow: 0 0 10px rgba(68, 255, 100, 0.5);
+    }
+
+    .stat-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .stat-value {
+      min-width: 40px;
+      text-align: center;
+      color: #44ff99;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .stat-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #44ff99, #ffd700);
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    /* Points Display */
+    .points-display {
+      text-align: center;
+      padding: 15px;
+      background: rgba(68, 255, 100, 0.1);
+      border: 1px solid #44ff99;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .points-display h3 {
+      color: #44ff99;
+      margin-bottom: 5px;
+    }
+
+    .points-value {
+      font-size: 2em;
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    /* Character Preview */
+    .preview {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #44ff99;
+      border-radius: 5px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .preview h3 {
+      color: #ffd700;
+      margin-bottom: 15px;
+    }
+
+    .preview-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      color: #aaa;
+      font-size: 0.9em;
+      border-bottom: 1px solid rgba(68, 255, 100, 0.2);
+    }
+
+    .preview-stat-value {
+      color: #44ff99;
+      font-weight: bold;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 15px 40px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-reset {
+      background: rgba(100, 50, 50, 0.6);
+      color: #ff6666;
+      border: 2px solid #ff6666;
+    }
+
+    .btn-reset:hover {
+      background: rgba(150, 50, 50, 0.8);
+      box-shadow: 0 0 20px rgba(255, 100, 100, 0.4);
+    }
+
+    .btn-create {
+      background: linear-gradient(135deg, #0a3020, #1a6040);
+      color: #44ff99;
+      border: 2px solid #44ff99;
+      flex: 1;
+    }
+
+    .btn-create:hover {
+      background: linear-gradient(135deg, #1a5030, #2a8060);
+      box-shadow: 0 0 30px rgba(68, 255, 100, 0.6);
+    }
+
+    .btn-create:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚔ CHARACTER CREATOR ⚔</h1>
+
+    <div class="content">
+      <!-- Left Panel: Input -->
+      <div class="section">
+        <!-- Name -->
+        <div class="name-input-group">
+          <label for="charName">Character Name</label>
+          <input type="text" id="charName" placeholder="Enter your name..." maxlength="30">
+        </div>
+
+        <!-- Class Selection -->
+        <div>
+          <div class="section-title">Choose Your Class</div>
+          <div class="class-selection">
+            <button class="class-btn" data-class="warrior">
+              ⚔ WARRIOR
+              <div class="class-desc">Strong attack & defense. Balanced.</div>
+            </button>
+            <button class="class-btn" data-class="mage">
+              🔮 MAGE
+              <div class="class-desc">High magic, low defense. Glass cannon.</div>
+            </button>
+            <button class="class-btn" data-class="rogue">
+              🗡️ ROGUE
+              <div class="class-desc">High speed & attack. Low defense.</div>
+            </button>
+            <button class="class-btn" data-class="paladin">
+              ✨ PALADIN
+              <div class="class-desc">High defense & magic. Balanced slow.</div>
+            </button>
+            <button class="class-btn" data-class="custom">
+              🎲 CUSTOM
+              <div class="class-desc">Build your own stats from scratch.</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Stats & Preview -->
+      <div class="section">
+        <!-- Points Display -->
+        <div class="points-display">
+          <h3>Stat Points Available</h3>
+          <div class="points-value" id="pointsLeft">20</div>
+        </div>
+
+        <!-- Stat Allocation -->
+        <div>
+          <div class="section-title">Allocate Stats</div>
+          <div class="stat-group">
+            <div class="stat-row">
+              <div class="stat-label">HP</div>
+              <div class="stat-controls">
+                <button class="stat-btn" id="hp-minus">−</button>
+                <div class="stat-value" id="hp-val">10</div>
+                <div class="stat-bar"><div class="stat-bar-fill" id="hp-bar"></div></div>
+                <button class="stat-btn" id="hp-plus">+</button>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Attack</div>
+              <div class="stat-controls">
+                <button class="stat-btn" id="atk-minus">−</button>
+                <div class="stat-value" id="atk-val">5</div>
+                <div class="stat-bar"><div class="stat-bar-fill" id="atk-bar"></div></div>
+                <button class="stat-btn" id="atk-plus">+</button>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Defense</div>
+              <div class="stat-controls">
+                <button class="stat-btn" id="def-minus">−</button>
+                <div class="stat-value" id="def-val">5</div>
+                <div class="stat-bar"><div class="stat-bar-fill" id="def-bar"></div></div>
+                <button class="stat-btn" id="def-plus">+</button>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Magic</div>
+              <div class="stat-controls">
+                <button class="stat-btn" id="mag-minus">−</button>
+                <div class="stat-value" id="mag-val">5</div>
+                <div class="stat-bar"><div class="stat-bar-fill" id="mag-bar"></div></div>
+                <button class="stat-btn" id="mag-plus">+</button>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Speed</div>
+              <div class="stat-controls">
+                <button class="stat-btn" id="spd-minus">−</button>
+                <div class="stat-value" id="spd-val">5</div>
+                <div class="stat-bar"><div class="stat-bar-fill" id="spd-bar"></div></div>
+                <button class="stat-btn" id="spd-plus">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Character Preview -->
+        <div class="preview">
+          <h3>Character Summary</h3>
+          <div class="preview-stat">
+            <span>Class:</span>
+            <span class="preview-stat-value" id="preview-class">Custom</span>
+          </div>
+          <div class="preview-stat">
+            <span>Total Stats:</span>
+            <span class="preview-stat-value" id="preview-total">30</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button class="btn btn-reset" onclick="resetStats()">Reset</button>
+      <button class="btn btn-create" id="createBtn" onclick="createCharacter()">Create Character</button>
+    </div>
+  </div>
+
+  <script>
+    // Class presets
+    const CLASS_PRESETS = {
+      warrior: { hp: 15, atk: 8, def: 8, mag: 3, spd: 6 },
+      mage: { hp: 8, atk: 4, def: 3, mag: 15, spd: 5 },
+      rogue: { hp: 10, atk: 12, def: 4, mag: 3, spd: 11 },
+      paladin: { hp: 13, atk: 6, def: 12, mag: 10, spd: 4 },
+      custom: { hp: 10, atk: 5, def: 5, mag: 5, spd: 5 }
+    };
+
+    const MAX_POINTS = 20;
+    const MAX_STAT = 25;
+    const MIN_STAT = 1;
+
+    let stats = { hp: 10, atk: 5, def: 5, mag: 5, spd: 5 };
+    let selectedClass = 'custom';
+
+    // Setup event listeners
+    function setupListeners() {
+      // Class buttons
+      document.querySelectorAll('.class-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectClass(btn.dataset.class));
+      });
+
+      // Stat buttons
+      ['hp', 'atk', 'def', 'mag', 'spd'].forEach(stat => {
+        document.getElementById(`${stat}-plus`).addEventListener('click', () => addStat(stat));
+        document.getElementById(`${stat}-minus`).addEventListener('click', () => removeStat(stat));
+      });
+
+      // Name input
+      document.getElementById('charName').addEventListener('input', updatePreview);
+    }
+
+    function selectClass(className) {
+      selectedClass = className;
+      document.querySelectorAll('.class-btn').forEach(btn => btn.classList.remove('selected'));
+      document.querySelector(`[data-class="${className}"]`).classList.add('selected');
+      
+      // Apply preset
+      const preset = CLASS_PRESETS[className];
+      stats = { ...preset };
+      updateDisplay();
+    }
+
+    function addStat(stat) {
+      const used = getTotalPoints();
+      if (used < MAX_POINTS && stats[stat] < MAX_STAT) {
+        stats[stat]++;
+        updateDisplay();
+      }
+    }
+
+    function removeStat(stat) {
+      if (stats[stat] > MIN_STAT) {
+        stats[stat]--;
+        updateDisplay();
+      }
+    }
+
+    function getTotalPoints() {
+      return Object.values(stats).reduce((a, b) => a + b, 0);
+    }
+
+    function updateDisplay() {
+      const total = getTotalPoints();
+      const pointsLeft = MAX_POINTS - total;
+
+      // Update stat values and bars
+      ['hp', 'atk', 'def', 'mag', 'spd'].forEach(stat => {
+        const val = stats[stat];
+        document.getElementById(`${stat}-val`).textContent = val;
+        document.getElementById(`${stat}-bar`).style.width = (val / MAX_STAT * 100) + '%';
+        
+        // Disable buttons if at limits
+        document.getElementById(`${stat}-plus`).disabled = pointsLeft <= 0 || val >= MAX_STAT;
+        document.getElementById(`${stat}-minus`).disabled = val <= MIN_STAT;
+      });
+
+      // Update points display
+      document.getElementById('pointsLeft').textContent = pointsLeft;
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const total = getTotalPoints();
+      document.getElementById('preview-class').textContent = selectedClass.toUpperCase();
+      document.getElementById('preview-total').textContent = total;
+    }
+
+    function resetStats() {
+      selectClass('custom');
+    }
+
+    function createCharacter() {
+      const name = document.getElementById('charName').value.trim();
+      if (!name) {
+        alert('Please enter a character name!');
+        return;
+      }
+
+      const character = {
+        name,
+        class: selectedClass,
+        stats,
+        created: new Date().toISOString()
+      };
+
+      console.log('Character Created:', character);
+      
+      // Save to localStorage for next page
+      localStorage.setItem('playerCharacter', JSON.stringify(character));
+
+      // Show success message
+      alert(`✓ Welcome, ${name} the ${selectedClass.toUpperCase()}!\n\nYour character has been created. The game world awaits...`);
+      
+      // Redirect to game (when ready)
+      // window.location.href = 'rpg-game.html';
+    }
+
+    // Initialize
+    setupListeners();
+    selectClass('custom');
+  </script>
+</body>
+</html>
