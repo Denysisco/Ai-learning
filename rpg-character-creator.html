@@ -29,6 +29,167 @@
       border-radius: 10px;
       padding: 40px;
       box-shadow: 0 0 50px rgba(68, 255, 100, 0.3);
+      position: relative;
+    }
+
+    /* Admin Login Button */
+    .admin-btn-top {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background: rgba(150, 50, 50, 0.6);
+      border: 1px solid #ff6666;
+      border-radius: 5px;
+      color: #ff6666;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .admin-btn-top:hover {
+      background: rgba(200, 50, 50, 0.8);
+      box-shadow: 0 0 15px rgba(255, 100, 100, 0.4);
+    }
+
+    .admin-btn-top.logged-in {
+      background: rgba(50, 150, 50, 0.6);
+      border-color: #44ff99;
+      color: #44ff99;
+    }
+
+    .admin-btn-top.logged-in:hover {
+      background: rgba(50, 200, 50, 0.8);
+      box-shadow: 0 0 15px rgba(68, 255, 100, 0.4);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(13, 10, 26, 0.98);
+      border: 2px solid #44ff99;
+      border-radius: 10px;
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 0 50px rgba(68, 255, 100, 0.5);
+    }
+
+    .modal-content h2 {
+      color: #44ff99;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.8em;
+      text-shadow: 0 0 15px rgba(68, 255, 100, 0.6);
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #44ff99;
+      border-radius: 5px;
+      color: #44ff99;
+      font-size: 1em;
+    }
+
+    .modal-content input::placeholder {
+      color: #666;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    .modal-btn-submit {
+      background: linear-gradient(135deg, #0a3020, #1a6040);
+      color: #44ff99;
+      border: 1px solid #44ff99;
+    }
+
+    .modal-btn-submit:hover {
+      background: linear-gradient(135deg, #1a5030, #2a8060);
+      box-shadow: 0 0 20px rgba(68, 255, 100, 0.5);
+    }
+
+    .modal-btn-cancel {
+      background: rgba(100, 50, 50, 0.6);
+      color: #ff6666;
+      border: 1px solid #ff6666;
+    }
+
+    .modal-btn-cancel:hover {
+      background: rgba(150, 50, 50, 0.8);
+    }
+
+    .error-msg {
+      color: #ff6666;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .success-msg {
+      color: #44ff99;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      background: rgba(150, 50, 50, 0.1);
+      border: 2px solid #ff6666;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .admin-panel.active {
+      display: block;
+    }
+
+    .admin-panel h3 {
+      color: #ff6666;
+      margin-bottom: 10px;
+    }
+
+    .admin-status {
+      font-size: 0.9em;
+      color: #aaa;
     }
 
     h1 {
@@ -119,9 +280,23 @@
       border-color: #ffd700;
     }
 
+    .class-btn.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(100, 100, 100, 0.3);
+      border-color: #888;
+      color: #888;
+    }
+
     .class-desc {
       font-size: 0.8em;
       color: #888;
+      margin-top: 3px;
+    }
+
+    .class-lock {
+      font-size: 0.75em;
+      color: #ff6666;
       margin-top: 3px;
     }
 
@@ -313,12 +488,46 @@
 
       .container {
         padding: 20px;
+        padding-top: 60px;
+      }
+
+      .admin-btn-top {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.8em;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Admin Login Button -->
+    <button class="admin-btn-top" id="adminBtn" onclick="openLoginModal()">🔐 Admin Login</button>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+      <div class="modal-content">
+        <h2>⚡ Admin Access</h2>
+        <div id="errorMsg" class="error-msg" style="display:none;"></div>
+        <input type="password" id="adminPassword" placeholder="Enter admin password..." onkeypress="handleKeyPress(event)">
+        <div class="modal-buttons">
+          <button class="modal-btn modal-btn-cancel" onclick="closeLoginModal()">Cancel</button>
+          <button class="modal-btn modal-btn-submit" onclick="checkAdminPassword()">Login</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+      <h3>⚡ ADMIN PANEL</h3>
+      <div class="admin-status">
+        <p>✓ Admin access granted</p>
+        <p>🌿 Druid class unlocked</p>
+        <button class="admin-btn-top" style="position:static; margin-top:10px;" onclick="logoutAdmin()">Logout</button>
+      </div>
+    </div>
+
     <h1>⚔ CHARACTER CREATOR ⚔</h1>
 
     <div class="content">
@@ -353,6 +562,11 @@
             <button class="class-btn" data-class="ranger">
               🏹 RANGER
               <div class="class-desc">Master of ranged combat. Tactical approach.</div>
+            </button>
+            <button class="class-btn locked" id="druidBtn" data-class="druid">
+              🌿 DRUID
+              <div class="class-desc">Master of nature. Full environmental control.</div>
+              <div class="class-lock">🔒 Admin Only</div>
             </button>
           </div>
         </div>
@@ -448,15 +662,92 @@
     const MAX_POINTS = 20;
     const MAX_STAT = 20;
     const MIN_STAT = 0;
+    const ADMIN_PASSWORD = 'H135531h';
 
     let stats = { hp: 0, atk: 0, def: 0, mag: 0, spd: 0 };
     let selectedClass = 'warrior';
+    let isAdmin = false;
+
+    // Check if already logged in
+    function checkAdminStatus() {
+      isAdmin = localStorage.getItem('adminLogged') === 'true';
+      updateAdminUI();
+    }
+
+    function updateAdminUI() {
+      const adminBtn = document.getElementById('adminBtn');
+      const adminPanel = document.getElementById('adminPanel');
+      const druidBtn = document.getElementById('druidBtn');
+
+      if (isAdmin) {
+        adminBtn.classList.add('logged-in');
+        adminBtn.textContent = '✓ Admin (Logout)';
+        adminPanel.classList.add('active');
+        druidBtn.classList.remove('locked');
+        druidBtn.style.cursor = 'pointer';
+      } else {
+        adminBtn.classList.remove('logged-in');
+        adminBtn.textContent = '🔐 Admin Login';
+        adminPanel.classList.remove('active');
+        druidBtn.classList.add('locked');
+        druidBtn.style.cursor = 'not-allowed';
+        if (selectedClass === 'druid') selectClass('warrior');
+      }
+    }
+
+    function openLoginModal() {
+      if (isAdmin) {
+        logoutAdmin();
+      } else {
+        document.getElementById('loginModal').classList.add('active');
+        document.getElementById('adminPassword').focus();
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        checkAdminPassword();
+      }
+    }
+
+    function checkAdminPassword() {
+      const password = document.getElementById('adminPassword').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        localStorage.setItem('adminLogged', 'true');
+        closeLoginModal();
+        updateAdminUI();
+      } else {
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = '❌ Incorrect password';
+      }
+    }
+
+    function logoutAdmin() {
+      isAdmin = false;
+      localStorage.removeItem('adminLogged');
+      updateAdminUI();
+    }
 
     // Setup event listeners
     function setupListeners() {
       // Class buttons
       document.querySelectorAll('.class-btn').forEach(btn => {
-        btn.addEventListener('click', () => selectClass(btn.dataset.class));
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('locked')) {
+            alert('🔒 Druid class is Admin Only!\n\nClick the Admin Login button to unlock.');
+            return;
+          }
+          selectClass(btn.dataset.class);
+        });
       });
 
       // Stat buttons
@@ -471,7 +762,7 @@
 
     function selectClass(className) {
       selectedClass = className;
-      document.querySelectorAll('.class-btn').forEach(btn => btn.classList.remove('selected'));
+      document.querySelectorAll('.class-btn:not(.locked)').forEach(btn => btn.classList.remove('selected'));
       document.querySelector(`[data-class="${className}"]`).classList.add('selected');
       updatePreview();
     }
@@ -547,6 +838,7 @@
         stats,
         level: 1,
         experience: 0,
+        isAdmin,
         created: new Date().toISOString()
       };
 
@@ -556,7 +848,8 @@
       localStorage.setItem('playerCharacter', JSON.stringify(character));
 
       // Show success message
-      alert(`✓ Welcome, ${name}!\n\nYour ${selectedClass.toUpperCase()} power awaits in the world...`);
+      const adminText = isAdmin ? ' (Admin)' : '';
+      alert(`✓ Welcome, ${name}!\n\nYour ${selectedClass.toUpperCase()}${adminText} power awaits in the world...`);
       
       // Redirect to game (when ready)
       // window.location.href = 'rpg-game.html';
@@ -565,6 +858,7 @@
     // Initialize
     setupListeners();
     selectClass('warrior');
+    checkAdminStatus();
   </script>
 </body>
 </html>
